@@ -89,6 +89,11 @@ const migrateDatabase = async () => {
       await runAsync('ALTER TABLE empleados ADD COLUMN horas_esperadas_semanales REAL DEFAULT 40.0');
       console.log('Columna horas_esperadas_semanales agregada');
     }
+
+    if (!columnNames.includes('hora_entrada_esperada')) {
+      await runAsync('ALTER TABLE empleados ADD COLUMN hora_entrada_esperada TEXT DEFAULT "08:00"');
+      console.log('Columna hora_entrada_esperada agregada');
+    }
   } catch (error) {
     console.error('Error en migración:', error);
   }
@@ -135,13 +140,13 @@ const dbFunctions = {
 
   getEmpleadoById: (id) => getAsync('SELECT * FROM empleados WHERE id = ?', [id]),
 
-  insertEmpleado: (nombre, apellido, horario_normal, horas_diarias = 8, horas_semanales = 40) =>
-    runAsync('INSERT INTO empleados (nombre, apellido, horario_normal, horas_esperadas_diarias, horas_esperadas_semanales) VALUES (?, ?, ?, ?, ?)',
-    [nombre, apellido, horario_normal, horas_diarias, horas_semanales]),
+  insertEmpleado: (nombre, apellido, horario_normal, horas_diarias = 8, horas_semanales = 40, hora_entrada = '08:00') =>
+    runAsync('INSERT INTO empleados (nombre, apellido, horario_normal, horas_esperadas_diarias, horas_esperadas_semanales, hora_entrada_esperada) VALUES (?, ?, ?, ?, ?, ?)',
+    [nombre, apellido, horario_normal, horas_diarias, horas_semanales, hora_entrada]),
 
-  updateEmpleado: (nombre, apellido, horario_normal, horas_diarias, horas_semanales, id) =>
-    runAsync('UPDATE empleados SET nombre = ?, apellido = ?, horario_normal = ?, horas_esperadas_diarias = ?, horas_esperadas_semanales = ? WHERE id = ?',
-    [nombre, apellido, horario_normal, horas_diarias, horas_semanales, id]),
+  updateEmpleado: (nombre, apellido, horario_normal, horas_diarias, horas_semanales, hora_entrada, id) =>
+    runAsync('UPDATE empleados SET nombre = ?, apellido = ?, horario_normal = ?, horas_esperadas_diarias = ?, horas_esperadas_semanales = ?, hora_entrada_esperada = ? WHERE id = ?',
+    [nombre, apellido, horario_normal, horas_diarias, horas_semanales, hora_entrada, id]),
 
   deleteEmpleado: (id) => runAsync('UPDATE empleados SET activo = 0 WHERE id = ?', [id]),
 

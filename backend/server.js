@@ -100,11 +100,9 @@ app.get('/api/empleados/estado-diario', async (req, res) => {
       let estadoPuntualidad = 'ausente'; // Por defecto ausente
       let horarioEsperado = null;
 
-      // Intentar extraer hora de entrada del horario_normal
-      // Formato esperado: "Lunes a Viernes 8:00-17:00" o "L-V 08:00-17:00"
-      const match = emp.horario_normal.match(/(\d{1,2}):(\d{2})/);
-      if (match) {
-        horarioEsperado = `${match[1].padStart(2, '0')}:${match[2]}`;
+      // Usar la hora de entrada esperada directamente
+      if (emp.hora_entrada_esperada) {
+        horarioEsperado = emp.hora_entrada_esperada;
       }
 
       if (emp.hora_entrada) {
@@ -163,9 +161,9 @@ app.get('/api/empleados/:id', async (req, res) => {
 // Crear nuevo empleado
 app.post('/api/empleados', async (req, res) => {
   try {
-    const { nombre, apellido, horario_normal, horas_esperadas_diarias, horas_esperadas_semanales } = req.body;
+    const { nombre, apellido, horario_normal, horas_esperadas_diarias, horas_esperadas_semanales, hora_entrada_esperada } = req.body;
 
-    if (!nombre || !apellido || !horario_normal) {
+    if (!nombre || !apellido || !horario_normal || !hora_entrada_esperada) {
       return res.status(400).json({ error: 'Todos los campos son obligatorios' });
     }
 
@@ -174,7 +172,8 @@ app.post('/api/empleados', async (req, res) => {
       apellido,
       horario_normal,
       horas_esperadas_diarias || 8,
-      horas_esperadas_semanales || 40
+      horas_esperadas_semanales || 40,
+      hora_entrada_esperada
     );
 
     res.status(201).json({
@@ -184,6 +183,7 @@ app.post('/api/empleados', async (req, res) => {
       horario_normal,
       horas_esperadas_diarias: horas_esperadas_diarias || 8,
       horas_esperadas_semanales: horas_esperadas_semanales || 40,
+      hora_entrada_esperada,
       message: 'Empleado creado exitosamente'
     });
   } catch (error) {
@@ -196,9 +196,9 @@ app.post('/api/empleados', async (req, res) => {
 app.put('/api/empleados/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, apellido, horario_normal, horas_esperadas_diarias, horas_esperadas_semanales } = req.body;
+    const { nombre, apellido, horario_normal, horas_esperadas_diarias, horas_esperadas_semanales, hora_entrada_esperada } = req.body;
 
-    if (!nombre || !apellido || !horario_normal) {
+    if (!nombre || !apellido || !horario_normal || !hora_entrada_esperada) {
       return res.status(400).json({ error: 'Todos los campos son obligatorios' });
     }
 
@@ -208,6 +208,7 @@ app.put('/api/empleados/:id', async (req, res) => {
       horario_normal,
       horas_esperadas_diarias || 8,
       horas_esperadas_semanales || 40,
+      hora_entrada_esperada,
       id
     );
 

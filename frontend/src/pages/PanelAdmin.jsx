@@ -44,6 +44,7 @@ const PanelAdmin = () => {
     nombre: '',
     apellido: '',
     horario_normal: '',
+    hora_entrada_esperada: '08:00',
     horas_esperadas_diarias: 8,
     horas_esperadas_semanales: 40
   });
@@ -102,6 +103,7 @@ const PanelAdmin = () => {
       nombre: empleado.nombre,
       apellido: empleado.apellido,
       horario_normal: empleado.horario_normal,
+      hora_entrada_esperada: empleado.hora_entrada_esperada || '08:00',
       horas_esperadas_diarias: empleado.horas_esperadas_diarias || 8,
       horas_esperadas_semanales: empleado.horas_esperadas_semanales || 40
     });
@@ -113,6 +115,7 @@ const PanelAdmin = () => {
       nombre: '',
       apellido: '',
       horario_normal: '',
+      hora_entrada_esperada: '08:00',
       horas_esperadas_diarias: 8,
       horas_esperadas_semanales: 40
     });
@@ -838,6 +841,17 @@ const PanelAdmin = () => {
                 placeholder="Ej: Lunes a Viernes 8:00-17:00"
                 required
               />
+              <p className="text-xs text-gray-500 mt-1">Puedes escribir en cualquier formato (ej: "L a V 8-17")</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">Hora de Entrada Esperada</label>
+              <Input
+                type="time"
+                value={formData.hora_entrada_esperada}
+                onChange={(e) => setFormData({ ...formData, hora_entrada_esperada: e.target.value })}
+                required
+              />
+              <p className="text-xs text-gray-500 mt-1">Se usa para calcular puntualidad</p>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>

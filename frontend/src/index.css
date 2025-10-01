@@ -131,4 +131,26 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Mejorar contraste para accesibilidad */
+  .text-white\/60 {
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .text-white\/80 {
+    color: rgba(255, 255, 255, 0.90);
+  }
+
+  /* Animación suave para gradiente */
+  @keyframes gradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
 }
