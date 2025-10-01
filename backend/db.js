@@ -147,14 +147,28 @@ const dbFunctions = {
 
   // Fichadas
   getAllFichadas: () => allAsync(`
-    SELECT f.*, e.nombre, e.apellido
+    SELECT
+      f.id,
+      f.empleado_id,
+      f.tipo,
+      datetime(f.fecha_hora, '-3 hours') as fecha_hora,
+      f.observaciones,
+      e.nombre,
+      e.apellido
     FROM fichadas f
     JOIN empleados e ON f.empleado_id = e.id
     ORDER BY f.fecha_hora DESC
   `),
 
   getFichadasByEmpleado: (empleadoId) => allAsync(`
-    SELECT f.*, e.nombre, e.apellido
+    SELECT
+      f.id,
+      f.empleado_id,
+      f.tipo,
+      datetime(f.fecha_hora, '-3 hours') as fecha_hora,
+      f.observaciones,
+      e.nombre,
+      e.apellido
     FROM fichadas f
     JOIN empleados e ON f.empleado_id = e.id
     WHERE f.empleado_id = ?
@@ -162,10 +176,17 @@ const dbFunctions = {
   `, [empleadoId]),
 
   getFichadasByFecha: (fecha) => allAsync(`
-    SELECT f.*, e.nombre, e.apellido
+    SELECT
+      f.id,
+      f.empleado_id,
+      f.tipo,
+      datetime(f.fecha_hora, '-3 hours') as fecha_hora,
+      f.observaciones,
+      e.nombre,
+      e.apellido
     FROM fichadas f
     JOIN empleados e ON f.empleado_id = e.id
-    WHERE DATE(f.fecha_hora) = ?
+    WHERE DATE(f.fecha_hora, '-3 hours') = ?
     ORDER BY f.fecha_hora DESC
   `, [fecha]),
 
@@ -184,9 +205,9 @@ const dbFunctions = {
   getFichadasDiarias: (fecha) => allAsync(`
     SELECT
       e.id, e.nombre, e.apellido, e.horario_normal,
-      GROUP_CONCAT(f.tipo || ':' || TIME(f.fecha_hora), ', ') as fichadas
+      GROUP_CONCAT(f.tipo || ':' || TIME(f.fecha_hora, '-3 hours'), ', ') as fichadas
     FROM empleados e
-    LEFT JOIN fichadas f ON e.id = f.empleado_id AND DATE(f.fecha_hora) = ?
+    LEFT JOIN fichadas f ON e.id = f.empleado_id AND DATE(f.fecha_hora, '-3 hours') = ?
     WHERE e.activo = 1
     GROUP BY e.id, e.nombre, e.apellido
     ORDER BY e.apellido, e.nombre
@@ -196,12 +217,12 @@ const dbFunctions = {
     SELECT
       e.id, e.nombre, e.apellido,
       COUNT(CASE WHEN f.tipo = 'ingreso' THEN 1 END) as dias_trabajados,
-      DATE(f.fecha_hora) as fecha,
-      GROUP_CONCAT(f.tipo || ':' || TIME(f.fecha_hora), ', ') as fichadas_dia
+      DATE(f.fecha_hora, '-3 hours') as fecha,
+      GROUP_CONCAT(f.tipo || ':' || TIME(f.fecha_hora, '-3 hours'), ', ') as fichadas_dia
     FROM empleados e
     LEFT JOIN fichadas f ON e.id = f.empleado_id
-    WHERE e.activo = 1 AND DATE(f.fecha_hora) BETWEEN ? AND ?
-    GROUP BY e.id, DATE(f.fecha_hora)
+    WHERE e.activo = 1 AND DATE(f.fecha_hora, '-3 hours') BETWEEN ? AND ?
+    GROUP BY e.id, DATE(f.fecha_hora, '-3 hours')
     ORDER BY e.apellido, e.nombre, fecha
   `, [fechaInicio, fechaFin]),
 
@@ -209,15 +230,15 @@ const dbFunctions = {
   getReportePersonalizado: async (empleadoId, fechaInicio, fechaFin) => {
     const query = `
       SELECT
-        DATE(f.fecha_hora) as fecha,
-        MIN(CASE WHEN f.tipo = 'ingreso' THEN TIME(f.fecha_hora) END) as hora_entrada,
-        MAX(CASE WHEN f.tipo = 'salida' THEN TIME(f.fecha_hora) END) as hora_salida,
-        MIN(CASE WHEN f.tipo = 'ingreso' THEN f.fecha_hora END) as fecha_hora_entrada,
-        MAX(CASE WHEN f.tipo = 'salida' THEN f.fecha_hora END) as fecha_hora_salida
+        DATE(f.fecha_hora, '-3 hours') as fecha,
+        MIN(CASE WHEN f.tipo = 'ingreso' THEN TIME(f.fecha_hora, '-3 hours') END) as hora_entrada,
+        MAX(CASE WHEN f.tipo = 'salida' THEN TIME(f.fecha_hora, '-3 hours') END) as hora_salida,
+        MIN(CASE WHEN f.tipo = 'ingreso' THEN datetime(f.fecha_hora, '-3 hours') END) as fecha_hora_entrada,
+        MAX(CASE WHEN f.tipo = 'salida' THEN datetime(f.fecha_hora, '-3 hours') END) as fecha_hora_salida
       FROM fichadas f
       WHERE f.empleado_id = ?
-        AND DATE(f.fecha_hora) BETWEEN ? AND ?
-      GROUP BY DATE(f.fecha_hora)
+        AND DATE(f.fecha_hora, '-3 hours') BETWEEN ? AND ?
+      GROUP BY DATE(f.fecha_hora, '-3 hours')
       ORDER BY fecha
     `;
 
@@ -233,14 +254,14 @@ const dbFunctions = {
         e.apellido,
         e.horas_esperadas_diarias,
         e.horas_esperadas_semanales,
-        DATE(f.fecha_hora) as fecha,
-        MIN(CASE WHEN f.tipo = 'ingreso' THEN TIME(f.fecha_hora) END) as hora_entrada,
-        MAX(CASE WHEN f.tipo = 'salida' THEN TIME(f.fecha_hora) END) as hora_salida
+        DATE(f.fecha_hora, '-3 hours') as fecha,
+        MIN(CASE WHEN f.tipo = 'ingreso' THEN TIME(f.fecha_hora, '-3 hours') END) as hora_entrada,
+        MAX(CASE WHEN f.tipo = 'salida' THEN TIME(f.fecha_hora, '-3 hours') END) as hora_salida
       FROM empleados e
       LEFT JOIN fichadas f ON e.id = f.empleado_id
-        AND DATE(f.fecha_hora) BETWEEN ? AND ?
+        AND DATE(f.fecha_hora, '-3 hours') BETWEEN ? AND ?
       WHERE e.activo = 1
-      GROUP BY e.id, DATE(f.fecha_hora)
+      GROUP BY e.id, DATE(f.fecha_hora, '-3 hours')
       ORDER BY e.apellido, e.nombre, fecha
     `;
 
