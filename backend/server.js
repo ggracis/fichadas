@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const nodemailer = require('nodemailer');
 const cron = require('node-cron');
 const ExcelJS = require('exceljs');
@@ -894,6 +895,11 @@ app.post('/api/test-email/semanal', async (req, res) => {
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Algo salió mal!' });
+});
+
+// SPA fallback - todas las rutas no-API sirven index.html
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 });
 
 // Iniciar servidor
