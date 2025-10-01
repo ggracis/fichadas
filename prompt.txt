@@ -1,0 +1,43 @@
+Eres un experto en desarrollo full-stack con React. Para este proyecto podes utilizar todos los agentes y MCP que consideres necesarios.
+Crea una aplicación web completa para registrar las fichadas (entradas y salidas) de empleados en una empresa, usando el siguiente stack:
+
+- Frontend: React (con Hooks y Context para estado global), Vite como bundler, y Shadcn para componentes UI (instala y usa componentes como Button, Dialog, Card, Table, etc., via shadcn-ui) la interfaz debe ser simple, grande, con un fondo que puede ir cambiando suavemente de color.
+- Backend: Node.js con Express para un servidor simple. Usa SQLite como base de datos (con la librería better-sqlite3 para Node). La DB se llamará 'empleados.db' y tendrá tablas para empleados (id, nombre, apellido, horario_normal) y fichadas (id, empleado_id, tipo: 'ingreso' o 'salida', fecha_hora: timestamp).
+- No uses autenticación compleja; manténlo simple con un panel admin accesible directamente (puedes agregar una ruta protegida básica si quieres, pero no es obligatorio).
+- Para versículos bíblicos: En la pantalla principal, muestra frases motivadoras o versículos aleatorios que roten cada hora. Usa por ejemplo la API https://bible-api.deno.dev/api/read/nvi/mateo/16/5-10 para fetch versículos aleatorios o similar; elige versículos comunes o aleatorios.
+
+Estructura general de la app:
+1. **Pantalla principal (para empleados)**: Ruta '/'. Muestra una lista de empleados (nombres y apellidos) en cards o botones grandes (usando Shadcn Card y Button). Al tocar/clickear en un nombre:
+   - Detecta si es ingreso o salida: Si no hay ingreso pendiente ese día, registra ingreso; si ya hay ingreso sin salida, registra salida.
+   - Muestra un Dialog (Shadcn Dialog) con mensaje: "Usted está registrando el [ingreso/salida] de [Nombre Apellido] a las [HH:MM]. Si la información es correcta, haga clic en aceptar."
+   - Al aceptar, envía un POST al backend para registrar en la DB (con fecha y hora actual).
+   - En el fondo o en un banner, muestra versículos bíblicos rotando (fetch de la API cada hora, muestra 1 a la vez).
+
+2. **Panel administrativo**: Ruta '/admin'. Accesible directamente (sin login por simplicidad).
+   - **Alta de empleados**: Formulario con campos: Nombre, Apellido, Horario normal (e.g., 'Lunes a Viernes 8-17'). POST al backend para insertar en DB.
+   - **Lista de empleados**: Tabla (Shadcn Table) con empleados, opciones para editar (Dialog con form) y eliminar.
+   - **Reportes útiles**: 
+     - Vista de fichadas por empleado/día/semana (tabla filtrable).
+     - Botón para generar reporte diario: Muestra ingresos, salidas y ausencias (comparando con horario normal).
+     - Botón para generar reporte semanal: Resumen de horas trabajadas, ausencias, etc.
+   - **Envío de emails**: Usa Nodemailer en el backend para enviar emails.
+     - Cron job (con node-cron) para email diario a las 20:00 con ingresos, salidas y ausencias del día (envía a un email fijo, e.g., admin@empresa.com).
+     - Cron job semanal (lunes a las 9:00) con reporte de la semana anterior.
+     - Mantén simple: Emails en texto plano con tablas básicas.
+
+Funciones adicionales útiles (manteniendo simplicidad):
+- En el admin: Filtro por fecha en reportes.
+- Validaciones básicas: No permitir fichadas duplicadas el mismo día, alertas si horario no se cumple (e.g., ingreso tarde).
+- Error handling: Muestra Toasts (Shadcn Toast) para éxitos/errores.
+- Persistencia: Todo en SQLite, inicializa la DB en el server startup.
+
+Instrucciones para el código:
+- Genera el código completo: package.json para frontend y backend, scripts para iniciar (e.g., 'npm run dev' para Vite, 'node server.js' para backend).
+- Usa Axios o Fetch para llamadas API entre frontend y backend.
+- Estructura folders: /frontend (con src/components, src/pages), /backend (server.js, db.js).
+- Instala dependencias necesarias: Para frontend: react, vite, shadcn-ui, axios. Para backend: express, better-sqlite3, nodemailer, node-cron.
+- Haz el código modular, con comentarios en español.
+- Prueba lógica simple: Incluye ejemplos de datos iniciales en DB (e.g., 3 empleados de prueba).
+- Asegúrate de que sea responsive y touch-friendly (para tablets/pantallas táctiles).
+
+Genera el código paso a paso: Primero el backend, luego el frontend, y al final instrucciones para correr la app.
